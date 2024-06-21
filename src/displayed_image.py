@@ -1,7 +1,7 @@
 import filetype
 from PIL import Image, ExifTags
 
-from fileformaterror import FileFormatError
+from exceptions import FileFormatError
 
 
 class DisplayedImage:
