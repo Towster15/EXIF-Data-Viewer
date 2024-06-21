@@ -11,12 +11,12 @@ class DisplayedImage:
         self.__exif_data = self.image.getexif()
 
     def load_new_image(self, file_path) -> None:
-        if filetype.is_image(file_path):
-            try:
+        try:
+            if filetype.is_image(file_path):
                 self.image = Image.open(file_path)
-            except OSError:
+            else:
                 raise FileFormatError("image")
-        else:
+        except OSError:
             raise FileFormatError("image")
 
     def get_exif(self) -> dict:
