@@ -8,7 +8,7 @@ class DisplayedImage:
     def __init__(self, file_path: str) -> None:
         self.image = None
         self.load_new_image(file_path)
-        self.__exif_data = self.image.getexif()
+        self.__exif_data = {}
 
     def load_new_image(self, file_path) -> None:
         try:
@@ -18,6 +18,8 @@ class DisplayedImage:
                 raise FileFormatError("image")
         except OSError:
             raise FileFormatError("image")
+        else:
+            self.__exif_data = self.image.getexif()
 
     def get_exif(self) -> dict:
         return {
