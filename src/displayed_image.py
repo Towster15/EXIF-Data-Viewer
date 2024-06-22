@@ -18,10 +18,9 @@ class DisplayedImage:
                 raise FileFormatError("image")
         except OSError:
             raise FileFormatError("image")
-        else:
-            self.__exif_data = self.image.getexif()
 
     def get_exif(self) -> dict:
+        self.__exif_data = self.image.getexif()
         return {
             ExifTags.TAGS[k]: v
             for k, v in self.__exif_data.items()
@@ -29,6 +28,7 @@ class DisplayedImage:
         }
 
     def get_important_exif(self) -> dict:
+        self.__exif_data = self.image.getexif()
         return {
             ExifTags.TAGS[k]: v
             for k, v in self.__exif_data.items()
