@@ -11,7 +11,9 @@ from PySide6.QtWidgets import (
     QPushButton,
     QMessageBox,
     QFileDialog,
+    QTableWidgetItem,
 )
+from os import getcwd
 
 from PIL import Image, ImageQt
 
@@ -38,16 +40,19 @@ class Window(QWidget):
 
         self.core_info_group = QGroupBox(title="Core Info")
         self.core_info_table = QTableWidget()
+        self.core_info_table.setHorizontalHeaderLabels(["Exif Tag", "Value"])
         self.core_info_group.layout = QVBoxLayout(self.core_info_group)
         self.core_info_group.layout.addWidget(self.core_info_table)
 
         self.os_info_group = QGroupBox(title="OS Information")
         self.os_info_table = QTableWidget()
+        self.os_info_table.setHorizontalHeaderLabels(["Key", "Value"])
         self.os_info_group.layout = QVBoxLayout(self.os_info_group)
         self.os_info_group.layout.addWidget(self.os_info_table)
 
         self.all_exif_group = QGroupBox(title="All EXIF Data")
         self.all_exif_table = QTableWidget()
+        self.all_exif_table.setHorizontalHeaderLabels(["Exif Tag", "Value"])
         self.all_exif_group.layout = QVBoxLayout(self.all_exif_group)
         self.all_exif_group.layout.addWidget(self.all_exif_table)
 
@@ -61,10 +66,31 @@ class Window(QWidget):
         # This is acceptable as ImageQt is a child of QImage
         pixmap = QPixmap(ImageQt.ImageQt(image))
         self.image_label.setPixmap(pixmap)
+        self.image_label.setScaledContents(True)
         if image.size[0] > self.screen_res[0] or image.size[1] > self.screen_res[1]:
             self.setFixedSize(
                 int(self.screen_res[0] * 0.8), int(self.screen_res[1] * 0.8)
             )
+        self.__fill_exif()
+
+    def __fill_exif(self) -> None:
+        self.__fill_data_table(
+            self.core_info_table, self.displayed_image.get_important_exif()
+        )
+        self.__fill_data_table(self.all_exif_table, self.displayed_image.get_exif())
+
+    def __fill_data_table(self, table: QTableWidget, exif_data: dict):
+        row_count = len(exif_data)
+        column_count = 2
+
+        table.setColumnCount(column_count)
+        table.setRowCount(row_count)
+
+        for i in range(0, row_count):
+            key = list(exif_data.keys())[i]
+            value = str(exif_data.get(list(exif_data.keys())[i]))
+            table.setItem(i, 0, QTableWidgetItem(key))
+            table.setItem(i, 1, QTableWidgetItem(value))
 
     @Slot()
     def __load_image(self) -> None:
@@ -72,7 +98,7 @@ class Window(QWidget):
             # TODO: deal with string "" being returned when open dialog cancelled
             self.displayed_image = DisplayedImage(
                 QFileDialog.getOpenFileName(
-                    self, "Open File", "/home", "Images (*.png *.xpm *.jpg)"
+                    self, "Open File", f"{getcwd()}", "Images (*.png *.xpm *.jpg)"
                 )[0]
             )
         except FileFormatError:
