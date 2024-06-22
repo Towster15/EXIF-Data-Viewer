@@ -20,9 +20,9 @@ from exceptions import FileFormatError
 
 
 class Window(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, screen_res: tuple[int, int]) -> None:
         super().__init__()
-
+        self.screen_res = screen_res
         self.displayed_image = None
 
         self.setWindowTitle("Image EXIF Viewer")
@@ -58,8 +58,13 @@ class Window(QWidget):
         self.layout.addWidget(self.all_exif_group, 0, 2, 2, 1)
 
     def __change_image(self, image: Image) -> None:
+        # This is acceptable as ImageQt is a child of QImage
         pixmap = QPixmap(ImageQt.ImageQt(image))
         self.image_label.setPixmap(pixmap)
+        if image.size[0] > self.screen_res[0] or image.size[1] > self.screen_res[1]:
+            self.setFixedSize(
+                int(self.screen_res[0] * 0.8), int(self.screen_res[1] * 0.8)
+            )
 
     @Slot()
     def __load_image(self) -> None:
@@ -83,6 +88,7 @@ class Window(QWidget):
 
 if __name__ == "__main__":
     app = QApplication([])
-    w = Window()
+    screen = app.primaryScreen()
+    w = Window(screen.size().toTuple())
     w.show()
     app.exec()
