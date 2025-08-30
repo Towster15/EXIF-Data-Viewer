@@ -68,9 +68,7 @@ class Window(QWidget):
         self.image_label.setPixmap(pixmap)
         self.image_label.setScaledContents(True)
         if image.size[0] > self.screen_res[0] or image.size[1] > self.screen_res[1]:
-            self.setFixedSize(
-                int(self.screen_res[0] * 0.8), int(self.screen_res[1] * 0.8)
-            )
+            self.resize(int(self.screen_res[0] * 0.8), int(self.screen_res[1] * 0.8))
         self.__fill_exif()
 
     def __fill_exif(self) -> None:
